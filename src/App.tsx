@@ -1,15 +1,25 @@
-import { useState } from 'react'
-
 import './App.css'
-
+import { Header } from './components/header'
+import { authClient } from './lib/auth-client'
+import { Loading } from './components/loading'
+import { Outlet } from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+const queryClient = new QueryClient();
 function App() {
-  const [count, setCount] = useState(0)
-
+  
+  const {useSession} = authClient;
+  const {data, isPending} = useSession();
+  
   return (
-    <>
-      <span className='text-5xl font-extrabold'>{count}</span>
-      <button className='w-fit h-10 px-4 py-2 bg-black text-white rounded-md' onClick={()=>setCount((prev)=>prev+1)}>Count</button>
-    </>
+    <QueryClientProvider client={queryClient}> 
+      {isPending ?
+        (<Loading/>):
+        (
+        <Header user={data?.user}/>
+        )
+      }
+      <Outlet/> 
+    </QueryClientProvider>
   )
 }
 
